@@ -13,7 +13,7 @@ all: lambda log
 
 deps:
 	rm -rf node_modules
-	npm install
+	yarn
 
 env:
 	rm -f env.json
