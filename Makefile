@@ -25,7 +25,7 @@ create-zip:
 
 lambda: deps env create-zip
 	aws lambda create-function --publish \
-	--function-name $(APP)-$(PROGRAM)-to-papertrail \
+	--function-name $(APP) \
 	--runtime nodejs4.3 \
 	--handler index.handler \
 	--zip-file fileb://code.zip \
@@ -33,13 +33,13 @@ lambda: deps env create-zip
 
 deploy: deps env create-zip
 	aws lambda update-function-code --publish \
-	--function-name $(APP)-$(PROGRAM)-to-papertrail \
+	--function-name $(APP) \
 	--zip-file fileb://code.zip
 
 log:
 	aws lambda add-permission \
-	--function-name $(APP)-$(PROGRAM)-to-papertrail \
-	--statement-id $(ALNUM_LOG_GROUP)__$(APP)-$(PROGRAM)-to-papertrail \
+	--function-name $(APP) \
+	--statement-id $(ALNUM_LOG_GROUP)__$(APP) \
 	--principal logs.$(AWS_DEFAULT_REGION).amazonaws.com \
 	--action lambda:InvokeFunction \
 	--source-arn arn:aws:logs:$(AWS_DEFAULT_REGION):$(ACCOUNT_ID):log-group:$(LOG_GROUP):* \
@@ -47,8 +47,8 @@ log:
 
 	aws logs put-subscription-filter \
 	--log-group-name $(LOG_GROUP) \
-	--destination-arn arn:aws:lambda:$(AWS_DEFAULT_REGION):$(ACCOUNT_ID):function:$(APP)-$(PROGRAM)-to-papertrail \
-	--filter-name LambdaStream_$(APP)-$(PROGRAM)-to-papertrail \
+	--destination-arn arn:aws:lambda:$(AWS_DEFAULT_REGION):$(ACCOUNT_ID):function:$(APP) \
+	--filter-name LambdaStream_$(APP) \
 	--filter-pattern ""
 
 clean:
@@ -60,4 +60,4 @@ test: env
 
 destroy:
 	aws lambda delete-function \
-	--function-name $(APP)-$(PROGRAM)-to-papertrail
+	--function-name $(APP)
