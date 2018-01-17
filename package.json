@@ -5,8 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "winston": "",
-    "winston-papertrail": "hyrwork/winston-papertrail",
-    "dogapi": ""
+    "winston-papertrail": "hyrwork/winston-papertrail"
   },
   "repository": {
     "type": "git",
