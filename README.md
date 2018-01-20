@@ -10,22 +10,22 @@ Then create lambda function and streams logs from the specified log group to thi
 
 ```bash
 $ export AWS_DEFAULT_REGION=us-east-1
-$ export HOST=logs.papertrailapp.com PORT=1234
-$ APP=helium PROGRAM=lambda LOG_GROUP=/aws/lambda/helium_transform make
+$ export PAPERTRAIL_HOST=logs.papertrailapp.com PAPERTRAIL_PORT=1234
+$ LAMBDA_NAME=lambda LOG_GROUP=/aws/lambda/log_group_name make
 ```
 
 To update existing lambda function:
 
 ```bash
-$ export HOST=logs.papertrailapp.com PORT=1234
-$ APP=helium PROGRAM=lambda make deploy
+$ export PAPERTRAIL_HOST=logs.papertrailapp.com PAPERTRAIL_PORT=1234
+$ LAMBDA_NAME=lambda make deploy
 ```
 
 To stream another log group to already existing lambda:
 
 ```bash
 $ export AWS_DEFAULT_REGION=us-east-1
-$ APP=helium PROGRAM=lambda LOG_GROUP=/aws/lambda/helium_compose make log
+$ LAMBDA_NAME=lambda LOG_GROUP=/aws/lambda/another_log_group_name make log
 ```
 
 By default, lambda doesn't wait for the event loop to empty before shutting down the function.
@@ -35,7 +35,7 @@ invocations.  It's also possible some logs may not get sent to papertrail at all
 
 To override this behavior, set `WAIT_FOR_FLUSH=true`, i.e.
 ```bash
-$ APP=helium PROGRAM=lambda WAIT_FOR_FLUSH=true make deploy
+$ LAMBDA_NAME=lambda WAIT_FOR_FLUSH=true make deploy
 ```
 
 Logs will be sent immediately to papertrail, at the expense of longer lambda execution times.

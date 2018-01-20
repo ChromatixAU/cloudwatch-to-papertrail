@@ -17,11 +17,12 @@ exports.handler = function (event, context, cb) {
       transports: []
     });
 
-    log.add(papertrailTransport, {
-      host: config.host,
-      port: config.port,
-      program: config.program,
-      hostname: config.appname,
+    log.add( papertrailTransport, {
+
+      host:         config.papertrailHost,
+      port:         config.papertrailPort,
+      hostname:     config.lambdaName,
+      program:      config.logGroup,
       flushOnClose: true,
       logFormat: function (level, message) {
         return message;
