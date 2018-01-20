@@ -54,7 +54,7 @@ clean:
 
 test: env
 	docker pull lambci/lambda
-	# docker run --name lambda --rm -v $(pwd):/var/task lambci/lambda index.handler '{}'
+	docker run --name lambda --rm -v $(pwd):/var/task lambci/lambda index.handler '{}'
 
 destroy:
 	aws lambda delete-function \
