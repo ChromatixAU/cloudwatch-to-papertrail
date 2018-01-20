@@ -1,19 +1,25 @@
-var zlib = require('zlib');
-var winston = require('winston');
-var papertrailTransport = require('winston-papertrail').Papertrail;
-var config = require('./env.json');
+/**
+ * AWS Lambda function to send a CloudWatch log group stream to Papertrail.
+ *
+ * @author Apiary Inc.
+ * @author Tim Malone <tim@timmalone.id.au>
+ */
 
-exports.handler = function (event, context, cb) {
+const zlib = require( 'zlib' ),
+      winston = require( 'winston' ),
+      papertrailTransport = require( 'winston-papertrail' ).Papertrail;
+
+const config = require( './env.json' );
+
+exports.handler = ( event, context, callback ) => {
   context.callbackWaitsForEmptyEventLoop = config.waitForFlush;
 
-  var payload = new Buffer(event.awslogs.data, 'base64');
+  const payload = new Buffer( event.awslogs.data, 'base64' );
 
-  zlib.gunzip(payload, function (err, result) {
-    if (err) {
-      return cb(err);
-    }
+  zlib.gunzip( payload, ( error, result ) => {
+    if ( error ) return callback( error );
 
-    var log = new (winston.Logger)({
+    const log = new ( winston.Logger )({
       transports: []
     });
 
@@ -24,19 +30,21 @@ exports.handler = function (event, context, cb) {
       hostname:     config.lambdaName,
       program:      config.logGroup,
       flushOnClose: true,
-      logFormat: function (level, message) {
+
+      logFormat: ( level, message ) => {
         return message;
       }
+
     });
 
-    var data = JSON.parse(result.toString('utf8'));
+    const data = JSON.parse( result.toString( 'utf8' ) );
 
-    data.logEvents.forEach(function (line) {
-      log.info(line.message);
+    data.logEvents.forEach( ( line ) => {
+      log.info( line.message );
     });
 
     log.close();
-    return cb();
+    return callback();
 
   });
 };
