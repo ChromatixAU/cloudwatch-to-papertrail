@@ -40,6 +40,7 @@ script:
 deploy:
   provider: script
   script: pip install awscli --upgrade --user && make deploy
+  skip_cleanup: true
   on:
     branch: master
 
