@@ -25,6 +25,10 @@ exports.handler = ( event, context, callback ) => {
       transports: []
     });
 
+    const data = JSON.parse( result.toString( 'utf8' ) );
+
+    if ( config.debug ) console.log( data );
+
     log.add( papertrailTransport, {
 
       host:         config.papertrailHost,
@@ -39,14 +43,13 @@ exports.handler = ( event, context, callback ) => {
 
     });
 
-    const data = JSON.parse( result.toString( 'utf8' ) );
-
     data.logEvents.forEach( ( line ) => {
+      if ( config.debug ) console.log( line.message );
       log.info( line.message );
     });
 
     log.close();
     return callback();
 
-  });
-};
+  }); // Gunzip.
+}; // Exports.handler.

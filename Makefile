@@ -2,7 +2,8 @@ PAPERTRAIL_HOST ?= logs.papertrailapp.com
 PAPERTRAIL_PORT ?= 1234
 LAMBDA_NAME ?= system_name
 LOG_GROUP ?= log_group_name
-WAIT_FOR_FLUSH ?= false
+WAIT_FOR_FLUSH ?= true
+CWTP_DEBUG ?= false
 
 ALNUM_LOG_GROUP = $(shell echo $(LOG_GROUP) | sed 's/[^[:alnum:]]/_/g')
 AWS_ACCOUNT_ID = $(shell aws sts get-caller-identity --output text --query Account)
@@ -15,7 +16,7 @@ deps:
 
 env:
 	rm -f env.json
-	echo "{\"papertrailHost\": \"$(PAPERTRAIL_HOST)\", \"papertrailPort\": $(PAPERTRAIL_PORT), \"lambdaName\": \"$(LAMBDA_NAME)\", \"logGroup\": \"$(LOG_GROUP)\", \"waitForFlush\": $(WAIT_FOR_FLUSH)}" > env.json
+	echo "{\"papertrailHost\": \"$(PAPERTRAIL_HOST)\", \"papertrailPort\": $(PAPERTRAIL_PORT), \"lambdaName\": \"$(LAMBDA_NAME)\", \"logGroup\": \"$(LOG_GROUP)\", \"waitForFlush\": $(WAIT_FOR_FLUSH), \"debug\": $(CWTP_DEBUG)}" > env.json
 
 create-zip:
 	rm -f code.zip

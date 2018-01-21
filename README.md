@@ -32,11 +32,16 @@ $ export AWS_DEFAULT_REGION=us-east-1
 $ LAMBDA_NAME=lambda LOG_GROUP=/aws/lambda/another_log_group_name make log
 ```
 
-By default, Lambda doesn't wait for the event loop to empty before shutting down the function. This means logs may not be sent immediately to Papertrail, but instead wait for future invocations. It's also possible some logs may not get sent to Papertrail at all. See [callbackWaitsForEmptyEventLoop](http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html) for details.
+By default, we force Lambda to wait for the event loop to empty before shutting down the function. This means logs will be sent immediately to Papertrail, at the expense of longer Lambda execution times, rather than quitting the function immediately and potentially making logs wait for future invocations (possibly also resulting in logs being missed). See [callbackWaitsForEmptyEventLoop](http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html) for details.
 
-To override this behavior, set `WAIT_FOR_FLUSH=true`, i.e.
+To reverse this behavior and instead prioritise shorter execution times over guaranteed delivery, set `WAIT_FOR_FLUSH=false`, i.e.
 ```bash
-$ LAMBDA_NAME=lambda WAIT_FOR_FLUSH=true make deploy
+$ LAMBDA_NAME=lambda WAIT_FOR_FLUSH=false make deploy
 ```
 
-Logs will then be sent immediately to Papertrail, at the expense of longer Lambda execution times.
+(The default behaviour here is the opposite to [Apiary's version](https://github.com/apiaryio/cloudwatch-to-papertrail) of this function).
+
+To test the function outside of Lambda, ensure you have Docker running, then run `make test`. This will use [LambCI's Docker Lambda environment](https://github.com/lambci/docker-lambda). If you need to debug any issues with the function, set `CWTP_DEBUG=true` to log data to the console, i.e.
+```bash
+$ CWTP_DEBUG=true make test
+```
