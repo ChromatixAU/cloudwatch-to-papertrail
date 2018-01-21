@@ -34,7 +34,7 @@ exports.handler = ( event, context, callback ) => {
       host:         config.papertrailHost,
       port:         config.papertrailPort,
       hostname:     config.lambdaName,
-      program:      config.logGroup,
+      program:      data.logGroup || config.logGroup,
       flushOnClose: true,
 
       logFormat: ( level, message ) => {
