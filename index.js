@@ -16,7 +16,7 @@ const config = require( './env.json' );
 exports.handler = ( event, context, callback ) => {
   context.callbackWaitsForEmptyEventLoop = config.waitForFlush;
 
-  const payload = new Buffer( event.awslogs.data, 'base64' );
+  const payload = Buffer.from( event.awslogs.data, 'base64' );
 
   zlib.gunzip( payload, ( error, result ) => {
     if ( error ) return callback( error );
