@@ -1,123 +1,55 @@
-var zlib = require('zlib');
-var winston = require('winston');
-var papertrailTransport = require('winston-papertrail').Papertrail;
-var dogapi = require('dogapi');
-var config = require('./env.json');
+/**
+ * AWS Lambda function to send a CloudWatch log group stream to Papertrail.
+ *
+ * @author Apiary Inc.
+ * @author Tim Malone <tim@timmalone.id.au>
+ */
 
-function addLambdaMetrics(data, match) {
-  var now = dogapi.now();
+'use strict';
 
-  data.push({
-    metric: 'aws.lambda.billed',
-    points: [
-      [now, match[1]]
-    ]
-  });
+const zlib = require( 'zlib' ),
+      winston = require( 'winston' ),
+      papertrailTransport = require( 'winston-papertrail' ).Papertrail;
 
-  data.push({
-    metric: 'aws.lambda.maxmemory',
-    points: [
-      [now, match[2]]
-    ]
-  });
-};
+const config = require( './env.json' );
 
-function addAppMetrics(data, match) {
-  var now = parseInt((new Date(match[1])).getTime()/1000);
-
-  var tags = [];
-  var points = [];
-
-  match[3].split(' ').forEach(function (metric) {
-    var keyValue = metric.split('=');
-
-    if (keyValue[0].indexOf('metric#') == -1) {
-      return;
-    }
-
-    if (keyValue[0].indexOf('metric#tag#') != -1) {
-      return tags.push(keyValue[0].replace('metric#tag#', '') + ':' + keyValue[1]);
-    }
-
-    points.push({
-      metric: [config.appname, config.program, match[2], keyValue[0].replace('metric#', '')].join('.'),
-      points: [
-        [now, parseInt(keyValue[1])]
-      ]
-    });
-  });
-
-  points.forEach(function (item) {
-    item.tags = tags;
-    data.push(item);
-  });
-};
-
-exports.handler = function (event, context, cb) {
+exports.handler = ( event, context, callback ) => {
   context.callbackWaitsForEmptyEventLoop = config.waitForFlush;
 
-  var payload = new Buffer(event.awslogs.data, 'base64');
+  const payload = Buffer.from( event.awslogs.data, 'base64' );
 
-  zlib.gunzip(payload, function (err, result) {
-    if (err) {
-      return cb(err);
-    }
+  zlib.gunzip( payload, ( error, result ) => {
+    if ( error ) return callback( error );
 
-    dogapi.initialize({
-      api_key: config.datadog
-    });
-
-    var log = new (winston.Logger)({
+    const log = new winston.Logger({
       transports: []
     });
 
-    log.add(papertrailTransport, {
-      host: config.host,
-      port: config.port,
-      program: config.program,
-      hostname: config.appname,
+    const data = JSON.parse( result.toString( 'utf8' ) );
+
+    if ( config.debug ) console.log( data );
+
+    log.add( papertrailTransport, {
+
+      host:         config.papertrailHost,
+      port:         config.papertrailPort,
+      hostname:     config.lambdaName,
+      program:      data.logGroup || config.logGroup,
       flushOnClose: true,
-      logFormat: function (level, message) {
+
+      logFormat: ( level, message ) => {
         return message;
       }
+
     });
 
-    var data = JSON.parse(result.toString('utf8'));
-
-    var metricRegex = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z)\ -\ info:\ ([a-z]+):.*?(metric#.*)+$/;
-    var reportRegex = /^REPORT\ RequestId.*Billed\ Duration:\ ([0-9]+)\ ms.*Used:\ ([0-9]+)\ MB$/;
-
-    var metricPoints = [];
-    var reportPoints = [];
-
-    data.logEvents.forEach(function (line) {
-      log.info(line.message);
-
-      if (config.datadog !== '') {
-        var metricMatch = line.message.trim().match(metricRegex);
-
-        if (metricMatch != null) {
-          return addAppMetrics(metricPoints, metricMatch);
-        }
-
-        var reportMatch = line.message.trim().match(reportRegex);
-
-        if (reportMatch != null) {
-          return addLambdaMetrics(reportPoints, reportMatch);
-        }
-      }
+    data.logEvents.forEach( ( line ) => {
+      if ( config.debug ) console.log( line.message );
+      log.info( line.message );
     });
 
-    if (config.datadog === '') {
-      log.close();
-      return cb();
-    }
+    log.close();
+    return callback( null, 'Logged ' + data.logEvents.length + ' lines to Papertrail.' );
 
-    dogapi.metric.send_all(metricPoints, function () {
-      dogapi.metric.send_all(reportPoints, function () {
-        log.close();
-        cb();
-      });
-    });
-  });
-};
+  }); // Gunzip.
+}; // Exports.handler.

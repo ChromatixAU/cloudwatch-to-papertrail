@@ -1,21 +1,33 @@
 {
   "name": "cloudwatch-to-papertrail",
   "version": "1.0.0",
-  "description": "Lambda to send cloudwatch logs to papertrail",
-  "main": "index.js",
-  "dependencies": {
-    "winston": "",
-    "winston-papertrail": "hyrwork/winston-papertrail",
-    "dogapi": ""
-  },
+  "description": "Lambda function to send AWS CloudWatch logs to Papertrail.",
+  "homepage": "https://github.com/tdmalone/cloudwatch-to-papertrail#readme",
+  "author": "Tim Malone <tim@timmalone.id.au>",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/apiaryio/cloudwatch-to-papertrail.git"
+    "url": "git+https://github.com/tdmalone/cloudwatch-to-papertrail.git"
   },
-  "author": "",
-  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/apiaryio/cloudwatch-to-papertrail/issues"
+    "url": "https://github.com/tdmalone/cloudwatch-to-papertrail/issues"
   },
-  "homepage": "https://github.com/apiaryio/cloudwatch-to-papertrail#readme"
+  "main": "index.js",
+  "scripts": {
+    "lint": "cross-env DEBUG=eslint:cli-engine eslint --color \"**/*.js\" --ignore-pattern '!.eslintrc.js'"
+  },
+  "keywords": [
+    "cloudwatch",
+    "papertrail",
+    "lambda"
+  ],
+  "dependencies": {
+    "eslint-config-tdmalone": "",
+    "winston": "",
+    "winston-papertrail": "hyrwork/winston-papertrail"
+  },
+  "devDependencies": {
+    "cross-env": "^5.1.0",
+    "eslint": "^4.8.0"
+  }
 }
