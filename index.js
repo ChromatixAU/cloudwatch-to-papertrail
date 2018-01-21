@@ -21,7 +21,7 @@ exports.handler = ( event, context, callback ) => {
   zlib.gunzip( payload, ( error, result ) => {
     if ( error ) return callback( error );
 
-    const log = new ( winston.Logger )({
+    const log = new winston.Logger({
       transports: []
     });
 
@@ -49,7 +49,7 @@ exports.handler = ( event, context, callback ) => {
     });
 
     log.close();
-    return callback();
+    return callback( null, 'Logged ' + data.logEvents.length + ' lines to Papertrail.' );
 
   }); // Gunzip.
 }; // Exports.handler.
