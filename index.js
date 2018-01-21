@@ -5,6 +5,8 @@
  * @author Tim Malone <tim@timmalone.id.au>
  */
 
+'use strict';
+
 const zlib = require( 'zlib' ),
       winston = require( 'winston' ),
       papertrailTransport = require( 'winston-papertrail' ).Papertrail;

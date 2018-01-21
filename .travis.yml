@@ -1,4 +1,11 @@
 language: node_js
+sudo: required
+
+node_js:
+  - "node"
+
+services:
+  - docker
 
 env:
   global:
@@ -24,7 +31,7 @@ cache:
     - node_modules
 
 install:
-  - echo 'Nothing to do'.
+  - yarn
 
 script:
   - yarn lint
