@@ -12,7 +12,7 @@ all: lambda log
 
 deps:
 	rm -rf node_modules
-	yarn
+	yarn --prod
 
 env:
 	rm -f env.json
