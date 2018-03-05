@@ -29,19 +29,22 @@ install:
   - yarn
 
 script:
+
   - yarn lint
   - make test
+
+  - pip install awscli --upgrade --user
 
 deploy:
 
   - provider: script
-    script: export AWS_DEFAULT_REGION=ap-southeast-2 && pip install awscli --upgrade --user && make deploy
+    script: export AWS_DEFAULT_REGION=ap-southeast-2 && make deploy
     skip_cleanup: true
     on:
       branch: chromatix
 
   - provider: script
-    script: AWS_DEFAULT_REGION=us-west-2 && pip install awscli --upgrade --user && make deploy
+    script: export AWS_DEFAULT_REGION=us-west-2 && make deploy
     skip_cleanup: true
     on:
       branch: chromatix
