@@ -19,7 +19,6 @@ env:
     - PAPERTRAIL_HOST=logs6.papertrailapp.com
     - AWS_ACCESS_KEY_ID=AKIAIY72BYOTX7AYCKAA
     - LAMBDA_NAME=cloudwatchToPapertrail
-    - AWS_DEFAULT_REGION=ap-southeast-2
 
 cache:
   yarn: true
@@ -34,8 +33,15 @@ script:
   - make test
 
 deploy:
+
   - provider: script
-    script: pip install awscli --upgrade --user && make deploy
+    script: export AWS_DEFAULT_REGION=ap-southeast-2 && pip install awscli --upgrade --user && make deploy
+    skip_cleanup: true
+    on:
+      branch: chromatix
+
+  - provider: script
+    script: AWS_DEFAULT_REGION=us-west-2 && pip install awscli --upgrade --user && make deploy
     skip_cleanup: true
     on:
       branch: chromatix
